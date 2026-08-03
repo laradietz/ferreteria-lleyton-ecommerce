@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ferretería Lleyton</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EEF0F0;
+    --surface:#FFFFFF;
+    --ink:#22262B;
+    --muted:#6B7278;
+    --line:#DADFE1;
+    --primary:#E06B26;
+    --primary-dark:#B84E14;
+    --primary-tint:#FCEBDD;
+    --steel:#3B4A56;
+    --steel-dark:#28333C;
+    --steel-tint:#E4EAED;
+    --amber:#C08A1E;
+    --amber-tint:#FBF1DC;
+    --sage:#3F7A55;
+    --sage-tint:#E5F1E9;
+    --coral:#B23B2C;
+    --coral-tint:#FBE7E3;
+    --gray:#78808A;
+    --gray-tint:#EDEFF1;
+    --radius:10px;
+    --shadow:0 1px 2px rgba(34,38,43,.06), 0 8px 24px -12px rgba(34,38,43,.20);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  h1,h2,h3,.brand{font-family:'Oswald',sans-serif;}
+  button{font-family:inherit;}
+  a{color:inherit;}
+  ::placeholder{color:#A6ACB2;}
+
+  /* ── LOGIN / REGISTER ──────────────────────────────────── */
+  #authScreen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:
+      radial-gradient(650px 420px at 12% 8%, rgba(224,107,38,.10), transparent 60%),
+      radial-gradient(520px 400px at 88% 92%, rgba(59,74,86,.10), transparent 60%),
+      var(--bg);
+  }
+  .auth-card{
+    width:100%;
+    max-width:400px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:34px 30px 26px;
+    position:relative;
+    overflow:hidden;
+  }
+  .auth-card::before{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:5px;
+    background:linear-gradient(90deg,var(--primary),var(--steel));
+  }
+  .badge-mark{
+    width:46px;height:46px;border-radius:8px;
+    background:var(--primary);
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Oswald',sans-serif;font-weight:700;font-size:20px;
+    margin-bottom:16px;
+    transform:rotate(-3deg);
+  }
+  .auth-card h1{
+    font-size:24px;font-weight:600;margin:0 0 2px;color:var(--steel-dark);
+    text-transform:uppercase;letter-spacing:.02em;
+  }
+  .auth-card p.sub{margin:0 0 22px;color:var(--muted);font-size:13.5px;}
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;font-size:11.5px;font-weight:600;letter-spacing:.04em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:6px;
+  }
+  .field input, .field select, .field textarea{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:14px;
+    font-family:inherit;
+    background:#fff;
+    color:var(--ink);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline:2px solid var(--primary);
+    outline-offset:1px;
+    border-color:var(--primary);
+  }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px 12px;}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    padding:10px 18px;
+    border-radius:8px;
+    border:1px solid transparent;
+    font-size:14px;font-weight:600;
+    cursor:pointer;
+    transition:filter .12s ease;
+  }
+  .btn:hover{filter:brightness(0.94);}
+  .btn:active{filter:brightness(0.88);}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-block{width:100%;}
+  .btn-ghost{background:transparent;color:var(--steel-dark);border-color:var(--line);}
+  .btn-danger{background:var(--coral-tint);color:var(--coral);}
+  .btn-steel{background:var(--steel);color:#fff;}
+  .btn-sm{padding:6px 10px;font-size:12.5px;border-radius:7px;}
+  .link-btn{
+    all:unset;cursor:pointer;color:var(--primary-dark);font-weight:600;font-size:13.5px;
+  }
+  .error-banner{
+    background:var(--coral-tint);color:var(--coral);
+    border:1px solid rgba(178,59,44,.25);
+    padding:10px 12px;border-radius:8px;
+    font-size:13px;margin-bottom:16px;
+    display:none;
+  }
+  .error-banner.show{display:block;}
+  .toggle-row{text-align:center;margin-top:16px;font-size:13.5px;color:var(--muted);}
+
+  /* ── APP SHELL ─────────────────────────────────────────── */
+  #app{display:none;min-height:100vh;grid-template-columns:224px 1fr;}
+  #app.show{display:grid;}
+  aside{
+    background:var(--steel-dark);
+    color:#E9EDEF;
+    padding:22px 14px;
+    display:flex;flex-direction:column;
+  }
+  .brand{
+    color:#fff;font-size:19px;font-weight:600;
+    display:flex;align-items:center;gap:9px;
+    margin-bottom:6px;padding:0 8px;
+    text-transform:uppercase;letter-spacing:.02em;
+  }
+  .brand .mark{
+    width:26px;height:26px;border-radius:6px;background:var(--primary);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:700;transform:rotate(-3deg);
+  }
+  .brand-sub{
+    padding:0 8px;margin-bottom:24px;font-size:11px;color:rgba(233,237,239,.55);
+    letter-spacing:.04em;text-transform:uppercase;
+  }
+  nav.tabs{display:flex;flex-direction:column;gap:2px;flex:1;}
+  nav.tabs button{
+    all:unset;cursor:pointer;
+    padding:10px 12px;border-radius:8px;
+    font-size:14px;font-weight:500;
+    color:rgba(233,237,239,.72);
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  nav.tabs button:hover{background:rgba(255,255,255,.06);color:#fff;}
+  nav.tabs button.active{background:var(--primary);color:#fff;}
+  nav.tabs .badge-count{
+    background:rgba(255,255,255,.18);color:#fff;border-radius:99px;
+    font-size:10.5px;font-family:'IBM Plex Mono',monospace;padding:1px 6px;
+  }
+  nav.tabs button.active .badge-count{background:rgba(255,255,255,.3);}
+  .nav-section-label{
+    padding:14px 12px 4px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:rgba(233,237,239,.4);
+  }
+  .user-box{
+    border-top:1px solid rgba(255,255,255,.12);
+    padding-top:14px;margin-top:10px;
+  }
+  .user-box .who{font-size:13px;font-weight:600;color:#fff;}
+  .user-box .role{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.05em;
+    color:var(--primary);text-transform:uppercase;
+  }
+  .user-box button{
+    margin-top:10px;all:unset;display:block;cursor:pointer;font-size:12.5px;
+    color:rgba(233,237,239,.6);
+  }
+  .user-box button:hover{color:#fff;}
+
+  main{padding:32px 40px;max-width:1180px;}
+  .view-header{
+    display:flex;align-items:baseline;justify-content:space-between;
+    margin-bottom:22px;flex-wrap:wrap;gap:12px;
+  }
+  .view-header h2{font-size:26px;font-weight:600;margin:0;color:var(--steel-dark);
+    text-transform:uppercase;letter-spacing:.01em;}
+
+  .toolbar{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap;}
+  .toolbar input, .toolbar select{
+    padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px;
+    background:#fff;font-family:inherit;
+  }
+
+  .card{
+    background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);
+  }
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  thead th{
+    text-align:left;font-size:11px;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;padding:12px 16px;border-bottom:1px solid var(--line);
+  }
+  tbody td{padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr.clickable{cursor:pointer;}
+  tbody tr.clickable:hover{background:var(--gray-tint);}
+  .empty-row td{color:var(--muted);text-align:center;padding:36px;font-size:14px;}
+
+  .pill{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:3px 10px 3px 8px;border-radius:99px;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;
+    letter-spacing:.03em;text-transform:uppercase;
+  }
+  .pill .d{width:6px;height:6px;border-radius:50%;}
+  .pill-amber{background:var(--amber-tint);color:var(--amber);}
+  .pill-amber .d{background:var(--amber);}
+  .pill-sage{background:var(--sage-tint);color:var(--sage);}
+  .pill-sage .d{background:var(--sage);}
+  .pill-coral{background:var(--coral-tint);color:var(--coral);}
+  .pill-coral .d{background:var(--coral);}
+  .pill-gray{background:var(--gray-tint);color:var(--gray);}
+  .pill-gray .d{background:var(--gray);}
+  .pill-steel{background:var(--steel-tint);color:var(--steel);}
+  .pill-steel .d{background:var(--steel);}
+
+  .row-actions{display:flex;gap:6px;flex-wrap:wrap;}
+
+  /* Catálogo: grilla de productos */
+  .product-grid{
+    display:grid;grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));gap:16px;
+  }
+  .product-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow);
+  }
+  .product-card .cat-tag{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--steel);
+    background:var(--steel-tint);display:inline-block;padding:2px 7px;border-radius:5px;
+    text-transform:uppercase;letter-spacing:.04em;width:fit-content;
+  }
+  .product-card h4{margin:2px 0 0;font-size:15px;font-weight:600;color:var(--ink);}
+  .product-card .sku{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+  .product-card .desc{font-size:12.5px;color:var(--muted);flex:1;line-height:1.4;}
+  .product-card .price-row{
+    display:flex;align-items:baseline;justify-content:space-between;margin-top:4px;
+  }
+  .product-card .price{
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:18px;color:var(--primary-dark);
+  }
+  .product-card .stock{font-size:11px;color:var(--muted);}
+  .product-card .stock.low{color:var(--coral);}
+
+  /* Modal */
+  .overlay{
+    display:none;position:fixed;inset:0;background:rgba(20,25,29,.5);
+    align-items:flex-start;justify-content:center;padding:48px 16px;overflow:auto;z-index:50;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:#fff;border-radius:14px;max-width:560px;width:100%;
+    box-shadow:0 24px 60px -20px rgba(0,0,0,.35);
+    padding:26px 26px 22px;
+  }
+  .modal h3{margin:0 0 4px;font-size:20px;color:var(--steel-dark);text-transform:uppercase;}
+  .modal p.sub{margin:0 0 18px;color:var(--muted);font-size:13px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px;}
+  .close-x{
+    all:unset;cursor:pointer;float:right;color:var(--muted);font-size:20px;line-height:1;
+  }
+  .toast{
+    position:fixed;bottom:22px;right:22px;background:var(--steel-dark);color:#fff;
+    padding:12px 18px;border-radius:9px;font-size:13.5px;box-shadow:var(--shadow);
+    display:none;z-index:60;
+  }
+  .toast.show{display:block;}
+
+  .detail-row{display:flex;justify-content:space-between;padding:7px 0;font-size:13.5px;
+    border-bottom:1px solid var(--line);}
+  .detail-row:last-child{border-bottom:none;}
+  .detail-row .k{color:var(--muted);}
+  .detail-row .v{font-weight:600;text-align:right;}
+  .total-line{
+    display:flex;justify-content:space-between;padding-top:12px;margin-top:6px;
+    border-top:2px solid var(--steel-dark);font-size:16px;font-weight:700;
+  }
+  .total-line .v{font-family:'IBM Plex Mono',monospace;color:var(--primary-dark);}
+
+  /* WhatsApp flotante */
+  .whatsapp-fab{
+    display:none;
+    position:fixed;bottom:24px;right:24px;z-index:40;
+    width:54px;height:54px;border-radius:50%;
+    background:#25D366;color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 18px -4px rgba(37,211,102,.55);
+    text-decoration:none;font-size:26px;
+    transition:transform .12s ease;
+  }
+  .whatsapp-fab.show{display:flex;}
+  .whatsapp-fab:hover{transform:scale(1.06);}
+
+  /* Imagen de producto */
+  .product-img{
+    width:100%;height:130px;border-radius:8px;overflow:hidden;
+    background:var(--gray-tint);display:flex;align-items:center;justify-content:center;
+  }
+  .product-img img{width:100%;height:100%;object-fit:cover;}
+  .img-placeholder{font-size:34px;color:var(--muted);}
+  .img-preview{
+    width:100%;height:120px;border-radius:8px;overflow:hidden;background:var(--gray-tint);
+    display:flex;align-items:center;justify-content:center;margin-top:8px;
+  }
+  .img-preview img{width:100%;height:100%;object-fit:cover;}
+  .thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;background:var(--gray-tint);vertical-align:middle;}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN / REGISTER ──────────────────────────────────── -->
+<div id="authScreen">
+  <div class="auth-card">
+    <div class="badge-mark">FL</div>
+    <h1 id="authTitle">Ferretería Lleyton</h1>
+    <p class="sub" id="authSubtitle">Iniciá sesión para comprar o gestionar la tienda.</p>
+    <div class="error-banner" id="authError"></div>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="loginUser">Usuario</label>
+        <input id="loginUser" autocomplete="username" placeholder="admin" required>
+      </div>
+      <div class="field">
+        <label for="loginPass">Contraseña</label>
+        <input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••" required>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit" id="loginBtn">Ingresar</button>
+      <p class="toggle-row">¿No tenés cuenta? <button type="button" class="link-btn" id="showRegisterBtn">Registrate</button></p>
+    </form>
+
+    <form id="registerForm" style="display:none;">
+      <div class="grid2">
+        <div class="field"><label>Nombre</label><input name="firstName" required></div>
+        <div class="field"><label>Apellido</label><input name="lastName" required></div>
+      </div>
+      <div class="field"><label>Usuario</label><input name="username" required></div>
+      <div class="field"><label>Email</label><input name="email" type="email" required></div>
+      <div class="field"><label>Contraseña</label><input name="password" type="password" required minlength="8"></div>
+      <div class="field"><label>Teléfono</label><input name="phone"></div>
+      <div class="field"><label>Dirección</label><input name="address" placeholder="Para tus envíos"></div>
+      <button class="btn btn-primary btn-block" type="submit" id="registerBtn">Crear cuenta</button>
+      <p class="toggle-row">¿Ya tenés cuenta? <button type="button" class="link-btn" id="showLoginBtn">Iniciar sesión</button></p>
+    </form>
+
+    <p class="toggle-row" style="margin-top:18px;font-size:12px;">
+      Admin de prueba: <span class="mono">admin</span> / <span class="mono">admin123</span>
+    </p>
+  </div>
+</div>
+
+<!-- ── APP ───────────────────────────────────────────────── -->
+<div id="app">
+  <aside>
+    <div class="brand"><span class="mark">FL</span> Lleyton</div>
+    <div class="brand-sub">Ferretería online</div>
+    <nav class="tabs" id="tabs"></nav>
+    <div class="user-box">
+      <div class="who" id="whoName">—</div>
+      <div class="role" id="whoRole">—</div>
+      <button id="myAccountBtn">Mi cuenta ⚙</button>
+      <button id="logoutBtn">Cerrar sesión →</button>
+    </div>
+  </aside>
+  <main>
+    <div class="error-banner" id="appError" style="max-width:640px;"></div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modalBody"></div>
+</div>
+<div class="toast" id="toast"></div>
+<a class="whatsapp-fab" id="whatsappFab" href="#" target="_blank" rel="noopener" title="Consultar por WhatsApp">💬</a>
+
+<script>
+/* ============================================================
+   CONFIG: WhatsApp de la ferretería
+   ============================================================ */
+// TODO: reemplazar por el número real, con código de país y área,
+// sin "+", espacios ni guiones. Ej: Argentina 11 1234-5678 → "5491112345678"
+const WHATSAPP_NUMBER = '5491112345678';
+
+function whatsappLink(message) {
+  return 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(message);
+}
+
+/* ============================================================
+   ESTADO
+   ============================================================ */
+let state = {
+  token: localStorage.getItem('lleyton_token') || null,
+  username: localStorage.getItem('lleyton_username') || null,
+  role: localStorage.getItem('lleyton_role') || null,
+  view: 'catalog',
+  categories: [],
+  cartCount: 0,
+};
+
+/* ============================================================
+   HELPERS DE API
+   ============================================================ */
+async function api(path, options = {}) {
+  const headers = Object.assign(
+    { 'Content-Type': 'application/json' },
+    options.headers || {}
+  );
+  if (state.token) headers['Authorization'] = 'Bearer ' + state.token;
+
+  let res;
+  try {
+    res = await fetch(path, { ...options, headers });
+  } catch (e) {
+    throw new Error('No se pudo conectar con la API. ¿Está corriendo el backend?');
+  }
+
+  if (res.status === 401) {
+    logout();
+    throw new Error('Sesión expirada o inválida. Iniciá sesión de nuevo.');
+  }
+  if (res.status === 204) return null;
+
+  let body = null;
+  const text = await res.text();
+  if (text) { try { body = JSON.parse(text); } catch (e) { body = null; } }
+
+  if (!res.ok) {
+    let msg = 'Ocurrió un error (' + res.status + ')';
+    if (body) {
+      if (body.message) msg = body.message;
+      else if (body.fields) msg = Object.entries(body.fields).map(([k, v]) => k + ': ' + v).join(' · ');
+      else if (body.error) msg = body.error;
+    }
+    if (res.status === 403) msg = 'No tenés permisos para hacer esto.';
+    if (res.status === 404 && !body) msg = 'No encontrado.';
+    throw new Error(msg);
+  }
+  return body;
+}
+
+function money(n) {
+  return '$' + Number(n).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+function pill(tone, label) {
+  return `<span class="pill pill-${tone}"><span class="d"></span>${escapeHtml(label)}</span>`;
+}
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+function showAppError(msg) {
+  const el = document.getElementById('appError');
+  el.textContent = msg; el.classList.add('show');
+}
+function isAdmin() { return state.role === 'ADMIN'; }
+
+/* ============================================================
+   AUTH: login / registro
+   ============================================================ */
+document.getElementById('showRegisterBtn').addEventListener('click', () => {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = 'block';
+  document.getElementById('authTitle').textContent = 'Crear cuenta';
+  document.getElementById('authSubtitle').textContent = 'Registrate para comprar en Ferretería Lleyton.';
+  document.getElementById('authError').classList.remove('show');
+});
+document.getElementById('showLoginBtn').addEventListener('click', () => {
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('loginForm').style.display = 'block';
+  document.getElementById('authTitle').textContent = 'Ferretería Lleyton';
+  document.getElementById('authSubtitle').textContent = 'Iniciá sesión para comprar o gestionar la tienda.';
+  document.getElementById('authError').classList.remove('show');
+});
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('authError');
+  errEl.classList.remove('show');
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Ingresando...';
+  try {
+    const data = await api('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: document.getElementById('loginUser').value.trim(),
+        password: document.getElementById('loginPass').value
+      })
+    });
+    state.token = data.token; state.username = data.username; state.role = data.role;
+    localStorage.setItem('lleyton_token', data.token);
+    localStorage.setItem('lleyton_username', data.username);
+    localStorage.setItem('lleyton_role', data.role);
+    enterApp();
+  } catch (err) {
+    errEl.textContent = err.message; errEl.classList.add('show');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Ingresar';
+  }
+});
+
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('authError');
+  errEl.classList.remove('show');
+  const btn = document.getElementById('registerBtn');
+  btn.disabled = true; btn.textContent = 'Creando cuenta...';
+  const fd = new FormData(e.target);
+  try {
+    await api('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: fd.get('username'), email: fd.get('email'), password: fd.get('password'),
+        firstName: fd.get('firstName'), lastName: fd.get('lastName'),
+        phone: fd.get('phone') || null, address: fd.get('address') || null
+      })
+    });
+    toast('Cuenta creada. Ahora iniciá sesión.');
+    document.getElementById('showLoginBtn').click();
+  } catch (err) {
+    errEl.textContent = err.message; errEl.classList.add('show');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Crear cuenta';
+  }
+});
+
+function logout() {
+  state.token = null; state.username = null; state.role = null;
+  localStorage.removeItem('lleyton_token');
+  localStorage.removeItem('lleyton_username');
+  localStorage.removeItem('lleyton_role');
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('whatsappFab').classList.remove('show');
+  document.getElementById('authScreen').style.display = 'flex';
+}
+document.getElementById('logoutBtn').addEventListener('click', logout);
+
+function enterApp() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('app').classList.add('show');
+  document.getElementById('whoName').textContent = state.username;
+  document.getElementById('whoRole').textContent = state.role;
+  document.getElementById('whatsappFab').href = whatsappLink(
+    'Hola! Quiero hacer una consulta sobre productos de Ferretería Lleyton.'
+  );
+  document.getElementById('whatsappFab').classList.add('show');
+  renderNav();
+  setView('catalog');
+  refreshCartCount();
+}
+
+/* ============================================================
+   NAV / ROUTER
+   ============================================================ */
+function renderNav() {
+  const tabs = document.getElementById('tabs');
+  let html = `<button data-view="catalog">Catálogo</button>`;
+  if (!isAdmin()) {
+    html += `<button data-view="cart">Carrito <span class="badge-count" id="cartBadge">0</span></button>`;
+    html += `<button data-view="orders">Mis Pedidos</button>`;
+  }
+  if (isAdmin()) {
+    html += `<div class="nav-section-label">Administración</div>`;
+    html += `<button data-view="admin-products">Productos</button>`;
+    html += `<button data-view="admin-categories">Categorías</button>`;
+    html += `<button data-view="admin-orders">Todos los Pedidos</button>`;
+  }
+  html += `<div class="nav-section-label">&nbsp;</div>`;
+  html += `<button data-view="notifications">Notificaciones</button>`;
+  tabs.innerHTML = html;
+  tabs.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-view]');
+    if (!btn) return;
+    setView(btn.dataset.view);
+  });
+}
+
+function setView(view) {
+  state.view = view;
+  document.querySelectorAll('#tabs button').forEach(b =>
+    b.classList.toggle('active', b.dataset.view === view));
+  document.getElementById('appError').classList.remove('show');
+  const renderers = {
+    catalog: renderCatalog,
+    cart: renderCart,
+    orders: renderOrders,
+    notifications: renderNotifications,
+    'admin-products': renderAdminProducts,
+    'admin-categories': renderAdminCategories,
+    'admin-orders': renderAdminOrders,
+  };
+  (renderers[view] || renderCatalog)();
+}
+
+async function refreshCartCount() {
+  if (isAdmin()) return;
+  try {
+    const cart = await api('/api/cart');
+    state.cartCount = cart.items.reduce((n, i) => n + i.quantity, 0);
+    const badge = document.getElementById('cartBadge');
+    if (badge) badge.textContent = state.cartCount;
+  } catch (e) { /* silencioso */ }
+}
+
+/* ============================================================
+   MODAL HELPERS
+   ============================================================ */
+function openModal(html) {
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('overlay').classList.add('show');
+}
+function closeModal() { document.getElementById('overlay').classList.remove('show'); }
+document.getElementById('overlay').addEventListener('click', (e) => {
+  if (e.target.id === 'overlay') closeModal();
+});
+
+/* ============================================================
+   MI CUENTA
+   ============================================================ */
+document.getElementById('myAccountBtn').addEventListener('click', openMyAccountModal);
+
+function openMyAccountModal() {
+  openModal(`
+    <button class="close-x" onclick="closeModal()">&times;</button>
+    <h3>Mi cuenta</h3>
+    <p class="sub">Cambiá tus datos. Necesitás tu contraseña actual para confirmar.</p>
+    <form id="accountForm">
+      <div class="grid2">
+        <div class="field"><label>Nombre</label><input name="firstName"></div>
+        <div class="field"><label>Apellido</label><input name="lastName"></div>
+      </div>
+      <div class="field"><label>Teléfono</label><input name="phone"></div>
+      <div class="field"><label>Dirección</label><input name="address"></div>
+      <div class="field"><label>Nuevo usuario</label><input name="newUsername" value="${escapeHtml(state.username||'')}"></div>
+      <div class="field"><label>Nueva contraseña</label><input name="newPassword" type="password" placeholder="Dejalo vacío para no cambiarla"></div>
+      <div class="field"><label>Contraseña actual (obligatoria)</label><input name="currentPassword" type="password" required></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+      </div>
+    </form>
+  `);
+  document.getElementById('accountForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const newUsername = fd.get('newUsername')?.trim();
+    try {
+      const updated = await api('/api/account/me', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          currentPassword: fd.get('currentPassword'),
+          newUsername: (newUsername && newUsername !== state.username) ? newUsername : null,
+          newPassword: fd.get('newPassword') || null,
+          firstName: fd.get('firstName') || null,
+          lastName: fd.get('lastName') || null,
+          phone: fd.get('phone') || null,
+          address: fd.get('address') || null
+        })
+      });
+      state.username = updated.username;
+      localStorage.setItem('lleyton_username', updated.username);
+      document.getElementById('whoName').textContent = state.username;
+      closeModal();
+      toast('Cuenta actualizada.');
+    } catch (err) { closeModal(); showAppError(err.message); }
+  });
+}
+
+/* ============================================================
+   CATEGORÍAS (cache liviana para selects)
+   ============================================================ */
+async function loadCategories() {
+  state.categories = await api('/api/categories');
+  return state.categories;
+}
+
+/* ============================================================
+   CATÁLOGO
+   ============================================================ */
+async function renderCatalog() {
+  const view = document.getElementById('view');
+  view.innerHTML = `
+    <div class="view-header"><h2>Catálogo</h2></div>
+    <div class="toolbar">
+      <input id="catSearch" placeholder="Buscar producto…" style="width:240px;">
+      <select id="catFilter"><option value="">Todas las categorías</option></select>
+    </div>
+    <div class="product-grid" id="productGrid">
+      <p style="color:var(--muted);">Cargando…</p>
+    </div>
+  `;
+  let categories = [];
+  try { categories = await loadCategories(); } catch (e) {}
+  const sel = document.getElementById('catFilter');
+  sel.innerHTML += categories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+
+  let t;
+  document.getElementById('catSearch').addEventListener('input', (e) => {
+    clearTimeout(t);
+    t = setTimeout(() => paintCatalog(), 300);
+  });
+  sel.addEventListener('change', paintCatalog);
+
+  paintCatalog();
+}
+
+async function paintCatalog() {
+  const grid = document.getElementById('productGrid');
+  const name = document.getElementById('catSearch').value.trim();
+  const categoryId = document.getElementById('catFilter').value;
+  grid.innerHTML = `<p style="color:var(--muted);">Cargando…</p>`;
+  try {
+    let qs = '';
+    if (categoryId) qs = '?categoryId=' + categoryId;
+    else if (name) qs = '?name=' + encodeURIComponent(name);
+    const list = await api('/api/products' + qs);
+    if (!list.length) {
+      grid.innerHTML = `<p style="color:var(--muted);">No se encontraron productos.</p>`;
+      return;
+    }
+    grid.innerHTML = list.map(p => `
+      <div class="product-card">
+        <div class="product-img">
+          ${p.imageUrl
+            ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.name)}">`
+            : `<span class="img-placeholder">🔧</span>`}
+        </div>
+        <span class="cat-tag">${escapeHtml(p.categoryName)}</span>
+        <h4>${escapeHtml(p.name)}</h4>
+        <div class="sku">SKU ${escapeHtml(p.sku)}</div>
+        <div class="desc">${escapeHtml(p.description || '')}</div>
+        <div class="price-row">
+          <span class="price">${money(p.price)}</span>
+          <span class="stock ${p.stock <= 5 ? 'low' : ''}">${p.stock > 0 ? p.stock + ' en stock' : 'Sin stock'}</span>
+        </div>
+        ${!isAdmin() ? `<button class="btn btn-primary btn-sm btn-block" ${p.stock<1?'disabled':''} onclick="quickAddToCart('${p.id}')">Agregar al carrito</button>` : ''}
+      </div>
+    `).join('');
+  } catch (err) { showAppError(err.message); grid.innerHTML = ''; }
+}
+
+async function quickAddToCart(productId) {
+  try {
+    await api('/api/cart/items', { method: 'POST', body: JSON.stringify({ productId, quantity: 1 }) });
+    toast('Agregado al carrito');
+    refreshCartCount();
+  } catch (err) { showAppError(err.message); }
+}
+
+/* ============================================================
+   CARRITO
+   ============================================================ */
+async function renderCart() {
+  const view = document.getElementById('view');
+  view.innerHTML = `
+    <div class="view-header"><h2>Carrito</h2></div>
+    <div class="card" style="padding:16px;" id="cartBox">Cargando…</div>
+  `;
+  await paintCart();
+}
+
+async function paintCart() {
+  const box = document.getElementById('cartBox');
+  try {
+    const cart = await api('/api/cart');
+    state.cartCount = cart.items.reduce((n,i) => n+i.quantity, 0);
+    const badge = document.getElementById('cartBadge'); if (badge) badge.textContent = state.cartCount;
+
+    if (!cart.items.length) {
+      box.innerHTML = `<p style="color:var(--muted);margin:0;">Tu carrito está vacío. Andá al catálogo para agregar productos.</p>`;
+      return;
+    }
+    box.innerHTML = `
+      <table>
+        <thead><tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Subtotal</th><th></th></tr></thead>
+        <tbody>
+          ${cart.items.map(i => `
+            <tr>
+              <td><strong>${escapeHtml(i.productName)}</strong></td>
+              <td class="mono">${money(i.unitPrice)}</td>
+              <td>
+                <input type="number" min="1" value="${i.quantity}" style="width:64px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;"
+                  onchange="updateCartItem('${i.id}', this.value)">
+              </td>
+              <td class="mono">${money(i.subtotal)}</td>
+              <td><button class="btn btn-sm btn-danger" onclick="removeCartItem('${i.id}')">Quitar</button></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      <div class="total-line" style="padding:14px 4px 4px;">
+        <span>Total</span><span class="v">${money(cart.total)}</span>
+      </div>
+      <div style="text-align:right;margin-top:10px;">
+        <button class="btn btn-primary" onclick="openCheckoutModal()">Confirmar pedido</button>
+      </div>
+    `;
+  } catch (err) { showAppError(err.message); box.innerHTML = ''; }
+}
+
+async function updateCartItem(itemId, quantity) {
+  quantity = parseInt(quantity, 10);
+  if (!quantity || quantity < 1) return;
+  try {
+    await api('/api/cart/items/' + itemId, { method: 'PATCH', body: JSON.stringify({ quantity }) });
+    paintCart();
+  } catch (err) { showAppError(err.message); paintCart(); }
+}
+async function removeCartItem(itemId) {
+  try {
+    await api('/api/cart/items/' + itemId, { method: 'DELETE' });
+    toast('Producto quitado'); paintCart();
+  } catch (err) { showAppError(err.message); }
+}
+
+async function openCheckoutModal() {
+  let address = '';
+  try { const me = await api('/api/account/me'); address = me.address || ''; } catch (e) {}
+  openModal(`
+    <button class="close-x" onclick="closeModal()">&times;</button>
+    <h3>Confirmar pedido</h3>
+    <p class="sub">Revisá la dirección de envío antes de generar el pedido.</p>
+    <form id="checkoutForm">
+      <div class="field">
+        <label>Dirección de envío</label>
+        <input name="shippingAddress" value="${escapeHtml(address)}" required>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Generar pedido</button>
+      </div>
+    </form>
+  `);
+  document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    try {
+      const order = await api('/api/orders', { method: 'POST', body: JSON.stringify({ shippingAddress: fd.get('shippingAddress') }) });
+      refreshCartCount();
+      openOrderCreatedModal(order);
+    } catch (err) { closeModal(); showAppError(err.message); }
+  });
+}
+
+function openOrderCreatedModal(order) {
+  const msg = 'Hola! Acabo de generar el pedido ' + order.id.slice(0,8) +
+              ' por ' + money(order.totalAmount) + ' en la tienda online. Quería avisarles.';
+  openModal(`
+    <button class="close-x" onclick="closeModal()">&times;</button>
+    <h3>¡Pedido generado!</h3>
+    <p class="sub">Pedido ${order.id.slice(0,8)} por ${money(order.totalAmount)}. Ya podés pagarlo desde "Mis Pedidos".</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal(); setView('orders');">Ver mis pedidos</button>
+      <a class="btn btn-primary" href="${whatsappLink(msg)}" target="_blank" rel="noopener" onclick="closeModal();">Avisar por WhatsApp</a>
+    </div>
+  `);
+}
+
+/* ============================================================
+   PEDIDOS (cliente)
+   ============================================================ */
+const ORDER_STATUS_PILL = {
+  PENDING:   ['amber', 'Pendiente'],
+  CONFIRMED: ['sage',  'Confirmado'],
+  SHIPPED:   ['steel', 'Enviado'],
+  DELIVERED: ['sage',  'Entregado'],
+  CANCELLED: ['coral', 'Cancelado'],
+};
+
+async function renderOrders() {
+  const view = document.getElementById('view');
+  view.innerHTML = `
+    <div class="view-header"><h2>Mis Pedidos</h2></div>
+    <div class="card"><table>
+      <thead><tr><th>Pedido</th><th>Fecha</th><th>Total</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="ordersBody"><tr class="empty-row"><td colspan="5">Cargando…</td></tr></tbody>
+    </table></div>
+  `;
+  try {
+    const list = await api('/api/orders');
+    const body = document.getElementById('ordersBody');
+    if (!list.length) {
+      body.innerHTML = `<tr class="empty-row"><td colspan="5">Todavía no hiciste ningún pedido.</td></tr>`;
+      return;
+    }
+    body.innerHTML = list.map(o => {
+      const [tone, label] = ORDER_STATUS_PILL[o.status] || ['gray', o.status];
+      return `
+        <tr class="clickable" onclick="openOrderDetail('${o.id}')">
+          <td class="mono">${o.id.slice(0,8)}</td>
+          <td>${fmtDate(o.createdAt)}</td>
+          <td class="mono">${money(o.totalAmount)}</td>
+          <td>${pill(tone, label)}</td>
+          <td><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation(); openOrderDetail('${o.id}')">Ver</button></td>
+        </tr>`;
+    }).join('');
+  } catch (err) { showAppError(err.message); }
+}
+
+async function openOrderDetail(orderId) {
+  let order, payment = null, shipment = null;
+  try {
+    order = await api('/api/orders/' + orderId);
+    try { payment = await api('/api/payments/pedido/' + orderId); } catch (e) {}
+    try { shipment = await api('/api/shipments/pedido/' + orderId); } catch (e) {}
+  } catch (err) { showAppError(err.message); return; }
+
+  const [tone, label] = ORDER_STATUS_PILL[order.status] || ['gray', order.status];
+
+  let actions = '';
+  if (order.status === 'PENDING') {
+    if (!payment) {
+      actions += `<button class="btn btn-primary btn-sm" onclick="openPayModal('${order.id}')">Pagar pedido</button>`;
+    }
+    actions += `<button class="btn btn-danger btn-sm" onclick="cancelMyOrder('${order.id}')">Cancelar pedido</button>`;
+  }
+
+  openModal(`
+    <button class="close-x" onclick="closeModal()">&times;</button>
+    <h3>Pedido ${order.id.slice(0,8)}</h3>
+    <p class="sub">${fmtDate(order.createdAt)} · ${pill(tone, label)}</p>
+
+    <div style="margin:14px 0;">
+      ${order.items.map(i => `
+        <div class="detail-row">
+          <span class="k">${escapeHtml(i.productName)} × ${i.quantity}</span>
+          <span class="v mono">${money(i.subtotal)}</span>
+        </div>
+      `).join('')}
+      <div class="total-line"><span>Total</span><span class="v">${money(order.totalAmount)}</span></div>
+    </div>
+
+    <div class="detail-row"><span class="k">Dirección de envío</span><span class="v">${escapeHtml(order.shippingAddress)}</span></div>
+    <div class="detail-row"><span class="k">Pago</span><span class="v">${payment ? payment.status + ' (' + payment.method + ')' : 'Sin registrar'}</span></div>
+    <div class="detail-row"><span class="k">Envío</span><span class="v">${shipment ? shipment.status + (shipment.trackingNumber ? ' · ' + shipment.trackingNumber : '') : 'Sin datos aún'}</span></div>
+
+    ${actions ? `<div class="modal-actions">${actions}</div>` : ''}
+  `);
+}
+
+function openPayModal(orderId) {
+  openModal(`
+    <button class="close-x" onclick="closeModal()">&times;</button>
+    <h3>Pagar pedido</h3>
+    <p class="sub">Elegí un método de pago (simulado, no se procesa un pago real).</p>
+    <form id="payForm">
+      <div class="field">
+        <label>Método de pago</label>
+        <select name="method" required>
+          <option value="MERCADO_PAGO">Mercado Pago</option>
+          <option value="CREDIT_CARD">Tarjeta de crédito</option>
+          <option value="DEBIT_CARD">Tarjeta de débito</option>
+          <option value="BANK_TRANSFER">Transferencia bancaria</option>
+          <option value="CASH">Efectivo</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Confirmar pago</button>
+      </div>
+    </form>
+  `);
+  document.getElementById('payForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    try {
+      await api('/api/payments', { method: 'POST', body: JSON.stringify({ orderId, method: fd.get('method') }) });
+      closeModal(); toast('Pago procesado'); setView('orders');
+    } catch (err) { closeModal(); showAppError(err.message); }
+  });
+}
+
+async function cancelMyOrder(orderId) {
+  if (!confirm('¿Cancelar este pedido?')) return;
+  try {
+    await api('/api/orders/' + orderId + '/cancelar', { method: 'PATCH' });
+    closeModal(); toast('Pedido cancelado'); setView('orders');
+  } catch (err) { closeModal(); showAppError(err.message); }
+}
+
+/* ============================================================
+   NOTIFICACIONES
+   ============================================================ */
+async function renderNotifications() {
+  const view = document.getElementById('view');
+  view.innerHTML = `
+    <div class="view-header"><h2>Notificaciones</h2></div>
+    <div class="card"><table>
+      <thead><tr><th>Asunto</th><th>Mensaje</th><th>Fecha</th><th></th></tr></thead>
+      <tbody id="notifBody"><tr class="empty-row"><td colspan="4">Cargando…</td></tr></tbody>
+    </table></div>
+  `;
+  try {
+    const list = await api('/api/notifications');
+    const body = document.getElementById('notifBody');
+    if (!list.length) {
+      body.innerHTML = `<tr class="empty-row"><td colspan="4">No tenés notificaciones todavía.</td></tr>`;
+      return;
+    }
+    body.innerHTML = list.map(n => `
+      <tr style="${n.read ? '' : 'background:var(--primary-tint);'}">
+        <td><strong>${escapeHtml(n.subject)}</strong></td>
+        <td>${escapeHtml(n.body)}</td>
+        <td class="mono">${fmtDate(n.createdAt)}</td>
+        <td>${!n.read ? `<button class="btn btn-sm btn-ghost" onclick="markNotifRead('${n.id}')">Marcar leída</button>` : ''}</td>
+      </tr>
+    `).join('');
+  } catch (err) { showAppError(err.message); }
+}
+async function markNotifRead(id) {
+  try { await api('/api/notifications/' + id + '/leer', { method: 'PATCH' }); renderNotifications(); }
+  catch (err) { showAppError(err.message); }
+}
+
+/* ============================================================
+   ADMIN: PRODUCTOS
+   ============================================================ */
+async function renderAdminProducts() {
+  const view = document.getElementById('view');
+  view.innerHTML = `
+    <div class="view-header"><h2>Productos</h2>
+      <button class="btn btn-primary" id="newProductBtn">+ Nuevo producto</button>
+    </div>
+    <div class="card"><table>
+      <thead><tr><th></th><th>SKU</th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="prodBody"><tr class="empty-row"><td colspan="8">Cargando…</td></tr></tbody>
+    </table></div>
+  `;
+  let categories = [];
+  try { categories = await loadCategories(); } catch (e) {}
+  document.getElementById('newProductBtn').addEventListener('click', () => openProductForm(categories));
+  paintAdminProducts();
+}
+
+async function paintAdminProducts() {
+  const body = document.getElementById('prodBody');
+  try {
+    const list = await api('/api/products');
+    if (!list.length) { body.innerHTML = `<tr class="empty-row"><td colspan="8">No hay productos cargados.</td></tr>`; return; }
+    body.innerHTML = list.map(p => `
+      <tr>
+        <td>${p.imageUrl ? `<img class="thumb" src="${escapeHtml(p.imageUrl)}" alt="">` : `<span class="thumb" style="display:inline-flex;align-items:center;justify-content:center;">🔧</span>`}</td>
+        <td class="mono">${escapeHtml(p.sku)}</td>
+        <td><strong>${escapeHtml(p.name)}</strong></td>
+        <td>${pill('steel', p.categoryName)}</td>
+        <td class="mono">${money(p.price)}</td>
+        <td class="mono">${p.stock}</td>
+        <td>${pill(p.active ? 'sage' : 'gray', p.active ? 'Activo' : 'Inactivo')}</td>
+        <td class="row-actions">
+          <button class="btn btn-sm btn-ghost" onclick='openProductForm(state.categories, ${JSON.stringify(p).replace(/'/g,"&#39;")})'>Editar</button>
+          ${p.active ? `<button class="btn btn-sm btn-danger" onclick="deactivateProduct('${p.id}')">Desactivar</button>` : ''}
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) { showAppError(err.message); }
+}
+
+function openProductForm(categories, existing) {
+  const isEdit = !!existing;
+  const currentUrl = isEdit ? (existing.imageUrl || '') : '';
+  openModal(`
+    <button class="close-x" onclick="closeModal()">&times;</button>
+    <h3>${isEdit ? 'Editar producto' : 'Nuevo producto'}</h3>
+    <form id="productForm">
+      <div class="grid2">
+        <div class="field"><label>SKU</label><input name="sku" value="${isEdit?escapeHtml(existing.sku):''}" ${isEdit?'readonly':''} required></div>
+        <div class="field"><label>Categoría</label>
+          <select name="categoryId" required>
+            ${categories.map(c => `<option value="${c.id}" ${isEdit && existing.categoryId===c.id?'selected':''}>${escapeHtml(c.name)}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Nombre</label><input name="name" value="${isEdit?escapeHtml(existing.name):''}" required></div>
+      <div class="field"><label>Descripción</label><textarea name="description" rows="2">${isEdit?escapeHtml(existing.description||''):''}</textarea></div>
+      <div class="grid2">
+        <div class="field"><label>Precio</label><input name="price" type="number" step="0.01" min="0" value="${isEdit?existing.price:''}" required></div>
+        <div class="field"><label>Stock</label><input name="stock" type="number" min="0" value="${isEdit?existing.stock:''}" required></div>
+      </div>
+      <div class="field">
+        <label>Foto del producto</label>
+        <input type="file" id="productImageFile" accept="image/png,image/jpeg,image/webp,image/gif">
+        <div class="img-preview" id="productImagePreview" style="${currentUrl ? '' : 'display:none;'}">
+          ${currentUrl ? `<img src="${escapeHtml(currentUrl)}" alt="">` : ''}
+        </div>
+        <input type="hidden" id="productImageUrlHidden" value="${escapeHtml(currentUrl)}">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="productFormSubmitBtn">${isEdit ? 'Guardar cambios' : 'Crear producto'}</button>
+      </div>
+    </form>
+  `);
+
+  document.getElementById('productImageFile').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const submitBtn = document.getElementById('productFormSubmitBtn');
+    submitBtn.disabled = true; submitBtn.textContent = 'Subiendo foto...';
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const headers = {};
+      if (state.token) headers['Authorization'] = 'Bearer ' + state.token;
+      const res = await fetch('/api/uploads/imagen', { method: 'POST', headers, body: fd });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.message || 'No se pudo subir la imagen');
+      }
+      const data = await res.json();
+      document.getElementById('productImageUrlHidden').value = data.url;
+      const preview = document.getElementById('productImagePreview');
+      preview.style.display = '';
+      preview.innerHTML = `<img src="${escapeHtml(data.url)}" alt="">`;
+    } catch (err) {
+      showAppError(err.message);
+    } finally {
+      submitBtn.disabled = false; submitBtn.textContent = isEdit ? 'Guardar cambios' : 'Crear producto';
+    }
+  });
+
+  document.getElementById('productForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const payload = {
+      name: fd.get('name'), description: fd.get('description') || null,
+      price: fd.get('price'), stock: parseInt(fd.get('stock'), 10),
+      imageUrl: document.getElementById('productImageUrlHidden').value || null,
+      categoryId: fd.get('categoryId')
+    };
+    try {
+      if (isEdit) {
+        payload.active = existing.active;
+        await api('/api/products/' + existing.id, { method: 'PUT', body: JSON.stringify(payload) });
+      } else {
+        payload.sku = fd.get('sku');
+        await api('/api/products', { method: 'POST', body: JSON.stringify(payload) });
+      }
+      closeModal(); toast(isEdit ? 'Producto actualizado' : 'Producto creado'); paintAdminProducts();
+    } catch (err) { closeModal(); showAppError(err.message); }
+  });
+}
+async function deactivateProduct(id) {
+  if (!confirm('¿Desactivar este producto?')) return;
+  try { await api('/api/products/' + id, { method: 'DELETE' }); toast('Producto desactivado'); paintAdminProducts(); }
+  catch (err) { showAppError(err.message); }
+}
+
+/* ============================================================
+   ADMIN: CATEGORÍAS
+   ============================================================ */
+async function renderAdminCategories() {
+  const view = document.getElementById('view');
+  view.innerHTML = `
+    <div class="view-header"><h2>Categorías</h2>
+      <button class="btn btn-primary" id="newCategoryBtn">+ Nueva categoría</button>
+    </div>
+    <div class="card"><table>
+      <thead><tr><th>Nombre</th><th>Descripción</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="catBody"><tr class="empty-row"><td colspan="4">Cargando…</td></tr></tbody>
+    </table></div>
+  `;
+  document.getElementById('newCategoryBtn').addEventListener('click', () => openCategoryForm());
+  paintAdminCategories();
+}
+async function paintAdminCategories() {
+  const body = document.getElementById('catBody');
+  try {
+    const list = await api('/api/categories');
+    state.categories = list;
+    if (!list.length) { body.innerHTML = `<tr class="empty-row"><td colspan="4">No hay categorías cargadas.</td></tr>`; return; }
+    body.innerHTML = list.map(c => `
+      <tr>
+        <td><strong>${escapeHtml(c.name)}</strong></td>
+        <td>${escapeHtml(c.description || '—')}</td>
+        <td>${pill(c.active ? 'sage' : 'gray', c.active ? 'Activa' : 'Inactiva')}</td>
+        <td class="row-actions">
+          <button class="btn btn-sm btn-ghost" onclick='openCategoryForm(${JSON.stringify(c).replace(/'/g,"&#39;")})'>Editar</button>
+          ${c.active ? `<button class="btn btn-sm btn-danger" onclick="deactivateCategory('${c.id}')">Desactivar</button>` : ''}
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) { showAppError(err.message); }
+}
+function openCategoryForm(existing) {
+  const isEdit = !!existing;
+  openModal(`
+    <button class="close-x" onclick="closeModal()">&times;</button>
+    <h3>${isEdit ? 'Editar categoría' : 'Nueva categoría'}</h3>
+    <form id="categoryForm">
+      <div class="field"><label>Nombre</label><input name="name" value="${isEdit?escapeHtml(existing.name):''}" required></div>
+      <div class="field"><label>Descripción</label><input name="description" value="${isEdit?escapeHtml(existing.description||''):''}"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">${isEdit ? 'Guardar cambios' : 'Crear categoría'}</button>
+      </div>
+    </form>
+  `);
+  document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const payload = { name: fd.get('name'), description: fd.get('description') || null };
+    try {
+      if (isEdit) await api('/api/categories/' + existing.id, { method: 'PUT', body: JSON.stringify(payload) });
+      else await api('/api/categories', { method: 'POST', body: JSON.stringify(payload) });
+      closeModal(); toast(isEdit ? 'Categoría actualizada' : 'Categoría creada'); paintAdminCategories();
+    } catch (err) { closeModal(); showAppError(err.message); }
+  });
+}
+async function deactivateCategory(id) {
+  if (!confirm('¿Desactivar esta categoría?')) return;
+  try { await api('/api/categories/' + id, { method: 'DELETE' }); toast('Categoría desactivada'); paintAdminCategories(); }
+  catch (err) { showAppError(err.message); }
+}
+
+/* ============================================================
+   ADMIN: TODOS LOS PEDIDOS
+   ============================================================ */
+async function renderAdminOrders() {
+  const view = document.getElementById('view');
+  view.innerHTML = `
+    <div class="view-header"><h2>Todos los Pedidos</h2></div>
+    <div class="card"><table>
+      <thead><tr><th>Pedido</th><th>Fecha</th><th>Total</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="adminOrdersBody"><tr class="empty-row"><td colspan="5">Cargando…</td></tr></tbody>
+    </table></div>
+  `;
+  paintAdminOrders();
+}
+async function paintAdminOrders() {
+  const body = document.getElementById('adminOrdersBody');
+  try {
+    const list = await api('/api/orders/all');
+    if (!list.length) { body.innerHTML = `<tr class="empty-row"><td colspan="5">No hay pedidos todavía.</td></tr>`; return; }
+    body.innerHTML = list.map(o => {
+      const [tone, label] = ORDER_STATUS_PILL[o.status] || ['gray', o.status];
+      return `
+        <tr class="clickable" onclick="openAdminOrderDetail('${o.id}')">
+          <td class="mono">${o.id.slice(0,8)}</td>
+          <td>${fmtDate(o.createdAt)}</td>
+          <td class="mono">${money(o.totalAmount)}</td>
+          <td>${pill(tone, label)}</td>
+          <td><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation(); openAdminOrderDetail('${o.id}')">Gestionar</button></td>
+        </tr>`;
+    }).join('');
+  } catch (err) { showAppError(err.message); }
+}
+
+async function openAdminOrderDetail(orderId) {
+  let order, payment = null, shipment = null;
+  try {
+    order = await api('/api/orders/' + orderId);
+    try { payment = await api('/api/payments/pedido/' + orderId); } catch (e) {}
+    try { shipment = await api('/api/shipments/pedido/' + orderId); } catch (e) {}
+  } catch (err) { showAppError(err.message); return; }
+
+  const [tone, label] = ORDER_STATUS_PILL[order.status] || ['gray', order.status];
+
+  openModal(`
+    <button class="close-x" onclick="closeModal()">&times;</button>
+    <h3>Pedido ${order.id.slice(0,8)}</h3>
+    <p class="sub">${fmtDate(order.createdAt)} · ${pill(tone, label)}</p>
+
+    <div style="margin:14px 0;">
+      ${order.items.map(i => `
+        <div class="detail-row">
+          <span class="k">${escapeHtml(i.productName)} × ${i.quantity}</span>
+          <span class="v mono">${money(i.subtotal)}</span>
+        </div>
+      `).join('')}
+      <div class="total-line"><span>Total</span><span class="v">${money(order.totalAmount)}</span></div>
+    </div>
+    <div class="detail-row"><span class="k">Dirección de envío</span><span class="v">${escapeHtml(order.shippingAddress)}</span></div>
+    <div class="detail-row"><span class="k">Pago</span><span class="v">${payment ? payment.status + ' (' + payment.method + ')' : 'Sin registrar'}</span></div>
+
+    <div class="field" style="margin-top:16px;">
+      <label>Cambiar estado del pedido</label>
+      <select id="orderStatusSelect">
+        ${['PENDING','CONFIRMED','SHIPPED','DELIVERED','CANCELLED'].map(s =>
+          `<option value="${s}" ${s===order.status?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+
+    <div class="grid2" style="margin-top:10px;">
+      <div class="field"><label>Transportista</label><input id="shipCarrier" value="${shipment?escapeHtml(shipment.carrier||''):''}"></div>
+      <div class="field"><label>N° de seguimiento</label><input id="shipTracking" value="${shipment?escapeHtml(shipment.trackingNumber||''):''}"></div>
+    </div>
+    <div class="field">
+      <label>Estado del envío</label>
+      <select id="shipStatus">
+        ${['PREPARING','IN_TRANSIT','DELIVERED','RETURNED'].map(s =>
+          `<option value="${s}" ${shipment && shipment.status===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
+      <button type="button" class="btn btn-steel" onclick="saveShipment('${order.id}')">Guardar envío</button>
+      <button type="button" class="btn btn-primary" onclick="saveOrderStatus('${order.id}')">Guardar estado</button>
+    </div>
+  `);
+}
+
+async function saveOrderStatus(orderId) {
+  const status = document.getElementById('orderStatusSelect').value;
+  try {
+    await api('/api/orders/' + orderId + '/estado?status=' + status, { method: 'PATCH' });
+    closeModal(); toast('Estado del pedido actualizado'); paintAdminOrders();
+  } catch (err) { showAppError(err.message); }
+}
+async function saveShipment(orderId) {
+  const carrier = document.getElementById('shipCarrier').value.trim();
+  const trackingNumber = document.getElementById('shipTracking').value.trim();
+  const status = document.getElementById('shipStatus').value;
+  if (!carrier || !trackingNumber) { showAppError('Completá transportista y número de seguimiento.'); return; }
+  try {
+    await api('/api/shipments/pedido/' + orderId, {
+      method: 'PUT', body: JSON.stringify({ carrier, trackingNumber, status })
+    });
+    closeModal(); toast('Envío actualizado'); paintAdminOrders();
+  } catch (err) { showAppError(err.message); }
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+if (state.token) { enterApp(); }
+</script>
+</body>
+</html>

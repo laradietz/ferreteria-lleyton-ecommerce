@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: lleyton-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - lleyton_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    container_name: lleyton-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ecommerce
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      JWT_SECRET: cambiar_esta_clave_en_produccion_min_256_bits_1234567890
+      SEED_ENABLED: "true"
+      SEED_ADMIN_USERNAME: admin
+      SEED_ADMIN_PASSWORD: admin123
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - lleyton_uploads:/app/uploads
+    ports:
+      - "8080:8080"
+
+volumes:
+  lleyton_db_data:
+  lleyton_uploads:
