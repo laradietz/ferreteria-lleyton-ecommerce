@@ -140,3 +140,22 @@ de datos ni contexto de Spring.
   `.jar`) y se sirven en `/uploads/<archivo>`. Con Docker, esa carpeta queda
   en un volumen (`lleyton_uploads`) para no perderse al reiniciar el
   contenedor.
+
+## Qué aprendí
+
+- Separar completamente las entidades JPA de lo que devuelve la API (DTOs
+  armados a mano en los servicios) para no depender de cómo Hibernate
+  serializa relaciones lazy.
+- Verificar la propiedad de un recurso (pedido, pago, envío) del lado del
+  servidor en cada operación, no solo mostrar/ocultar botones en el frontend.
+- Diseñar un pago simulado de forma explícita y documentada, en vez de dejar
+  ambigüedad sobre qué es real y qué no en un proyecto de portfolio.
+
+## Próximas mejoras
+
+- Reemplazar `ddl-auto=update` por migraciones versionadas con Flyway.
+- Agregar tests de integración con Testcontainers (hoy los tests unitarios
+  cubren `ProductService` y `CartService`, pero no el flujo completo contra
+  una base real).
+- Integrar un proveedor de pagos real (Mercado Pago) detrás de la misma
+  interfaz que hoy usa el pago simulado.
